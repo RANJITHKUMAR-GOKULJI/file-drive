@@ -79,8 +79,7 @@ class SidePanel extends Component{
                             <div className="dropdown-item" type="button" data-toggle="tooltip" data-placement="top" onClick={changeFolder.bind(this)} name={folderName} id={userName+"/"+folderName} key={index}>
                                 <text >{folderName}</text>
                             </div>
-                                <i className="fa fa-close align-self-center" onClick={deleteFolder.bind(this)} name={folderName} id={folderName}></i>
-                            
+                                <i className="fa fa-close align-self-center" onClick={deleteFolder.bind(this)} name={folderName} id={folderName}></i>                            
                         </div>
                     )}
                 </div>
