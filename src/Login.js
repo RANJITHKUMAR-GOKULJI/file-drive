@@ -21,11 +21,10 @@ class Login extends Component{
 
     componentDidMount(){
         console.error(store.getState())
-        this.props.printSession('sd')
-        // console.error()
+        this.props.printSession('sd');
     }
 
-    
+
     render(){
         return(
             <div className="container">
@@ -47,6 +46,7 @@ class Login extends Component{
         )
     }
 }
+
 
 export default connect((state)=>{
     return{

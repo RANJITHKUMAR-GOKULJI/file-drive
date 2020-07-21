@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import Functions, {deleteFolder, createNew, inputChange, changeFolder} from './utilities/Functions';
+import {deleteFolder, createNew, inputChange, changeFolder} from './utilities/Functions';
 import Axios from 'axios';
 import serverUrl from './utilities/general_const';
 import cookie from 'react-cookies';
+import {Spinner} from 'reactstrap';
 
 import {connect} from 'react-redux';
 import action from './Redux/action';
@@ -17,7 +18,8 @@ class SidePanel extends Component{
             delFolderName:'',
             newFolderName:'',
             retrieveItems:[],            
-            printSession: props.printSession           
+            printSession: props.printSession,
+            sessionUser: props.sessionUser          
         }
     }
 
@@ -33,6 +35,7 @@ class SidePanel extends Component{
         const token = cookie.load('token');
 
         this.setState({userName: token.userName})
+        
         this.props.printSession(token.userName)              
 
         const timer = setTimeout(()=>{
@@ -57,36 +60,50 @@ class SidePanel extends Component{
     }
 
     render(){
-        const {retrieveItems, userName} = this.state;
-        return(            
-            <div className="border-right sideView container" id="sideDiv">
-                <div>
-                    <h3>NDrive</h3>                
-                </div>
-                <div>
-                    <form onSubmit={createNew.bind(this)} className="d-flex form-check-inline">
-                        <input type="text" className="w-100 h-100" name="newFolderName" onChange={inputChange.bind(this)}></input>
-                        <button type="submit" aria-expanded="false" className="btn btn-sm" aria-controls="inputName" data-toggle="collapse" data-target="#inputName" name="createFolder"><i className="fa fa-folder"/></button>                    
-                    </form>
-                </div>
-                <div className="">
-                    
-                        <div className="nav-tabs dropdown-header" type="button" onClick={changeFolder.bind(this)} name="all" id={userName+"/"}>
-                            All
-                        </div>
-                    {retrieveItems.length !== 0 && retrieveItems.map((folderName, index)=>
-                        <div className="d-flex">
-                            <div className="dropdown-item" type="button" data-toggle="tooltip" data-placement="top" onClick={changeFolder.bind(this)} name={folderName} id={userName+"/"+folderName} key={index}>
-                                <text >{folderName}</text>
+        if((this.state.userName) && (this.state.retrieveItems)){
+            const {retrieveItems, userName} = this.state;
+            return(            
+                <div className="border-right sideView container" id="sideDiv">
+                    <div>
+                        <h3>NDrive</h3>                
+                    </div>
+                    <div>
+                        <form onSubmit={createNew.bind(this)} className="d-flex form-check-inline">
+                            <input type="text" className="w-100 h-100" name="newFolderName" onChange={inputChange.bind(this)}></input>
+                            <button type="submit" aria-expanded="false" className="btn btn-sm" aria-controls="inputName" data-toggle="collapse" data-target="#inputName" name="createFolder"><i className="fa fa-folder"/></button>                    
+                        </form>
+                    </div>
+                    <div className="">
+                        
+                            <div className="nav-tabs dropdown-header allFolder" type="button" onClick={changeFolder.bind(this)} name="allFolder" id={userName}>
+                                All
                             </div>
-                                <i className="fa fa-close align-self-center" onClick={deleteFolder.bind(this)} name={folderName} id={folderName}></i>                            
-                        </div>
-                    )}
+                        {retrieveItems.length !== 0 && retrieveItems.map((folderName, index)=>
+                            <div className="d-flex">
+                                <div className="dropdown-item" type="button" data-toggle="tooltip" data-placement="top" onClick={changeFolder.bind(this)} name={folderName} id={userName+"/"+folderName} key={index}>
+                                    <text >{folderName}</text>
+                                </div>
+                                    <i className="fa fa-close align-self-center" onClick={deleteFolder.bind(this)} name={folderName} id={folderName}></i>                            
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        }
+        else{
+            return( 
+                <div className="spinners">
+                  <Spinner type="grow" color="primary" />
+                  <Spinner type="grow" color="secondary" /> 
+                  <Spinner type="grow" color="success" />
+                  <Spinner type="grow" color="danger" />
+                  <Spinner type="grow" color="warning" />
+                  <Spinner type="grow" color="info" />
+                  <Spinner type="grow" color="primary" />
+                  <Spinner type="grow" color="dark" />
+                </div>);
+        }
     }
-    
 }
 
 //export default SidePanel;

@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+//import React, { Component } from 'react';
 import cookie from 'react-cookies';
 import Axios from 'axios';
 import serverUrl from './general_const';
 import store from '../Redux/store';
-import { act } from 'react-dom/test-utils';
 
-export default class Functions extends Component{
+/*export default class Functions extends Component{
     constructor(props){
         super(props);
         this.state = {
@@ -13,14 +12,16 @@ export default class Functions extends Component{
         }
     }
 
-}
+}*/
 
 export function setUserCookie(e){
     console.error('set User cookie')
 }
 
 //Start of Login Page Functions
-export function loginFunc(){
+export function loginFunc(e){
+    console.log(e.target.name);
+    console.error(this);
     const{userName,password} = this.state;   
     console.error(userName);     
     Axios({
@@ -150,9 +151,10 @@ export function deleteFolder(e){
             },
             responseType:'json'
         }).then(res=>{
-            console.error(res);
+            console.error(res);  
+            console.error(res.data.doc.err && alert('Folder Not deleted.'))          
             this.setState({retrieveItems: res.data.items})
-        }).catch(err=>{
+        }).catch(err=>{            
             console.error(err);
         })
     },500)
@@ -171,7 +173,7 @@ export function activeTab(e){
     console.error(sessionData.sessionUser.data)
 
     const timer = setTimeout(() => {
-        const {fileType, folderName} = this.state;
+        const {fileType} = this.state;
         Axios({
             method:'get',
             url: serverUrl+'/file/fileRetrieve',
@@ -202,17 +204,21 @@ export function fileUpload(e){
 }
 
 export function uploadFile(e){
+    e.preventDefault();
     console.error('upload');
-    const{file,userName,folderName} = this.state;
+    const{file} = this.state;
+    console.error(file)
+    //alert(file);
     !({file}) && alert('File not Selected');
-
+    
     const sessionData = store.getState()
     console.error(sessionData.sessionUser.data)
-
+    const currentFolder = sessionData.sessionUser.data;
     var bodyFormData = new FormData();
-    bodyFormData.set('folder', sessionData.sessionUser.data);        
+    bodyFormData.set('folder', currentFolder);        
     bodyFormData.append('file', file);    
 
+    console.error("Folder",bodyFormData.getAll('folder'));
     Axios({
         method:'post',
         url: serverUrl+'/file/upload',
@@ -221,12 +227,48 @@ export function uploadFile(e){
         //headers: {'Content-Type': 'multipart/form-data' }
     }).then(res=>{
         (res.data.err) && alert('Upload Failed: filename already exists');
-        (res.data.doc) && alert('File Upload Successs');
+        (res.data.doc) && alert('File Upload Successs. \n Uploaded File name: '+res.data.doc.fileName);
         console.error(res);
-        this.setState({retrieveItems: [...this.state.retrieveItems , res.doc.fileName]});            
+        this.setState({retrieveItems: [...this.state.retrieveItems , res.data.doc.fileName]});  
+        document.getElementById(currentFolder).click();          
     }).catch(err=>{
         console.error(err);
     })
+}
+
+export function deleteFile(e){
+    
+    const {userName} = this.state;
+    //alert('Are You sure')
+    const delFileName= e.target.id;
+    
+    const sessionData = store.getState()
+    console.error(sessionData.sessionUser.data)
+    const delFolderName = sessionData.sessionUser.data;
+
+    this.setState({delFileName: e.target.id});
+    const Timer = setTimeout(()=>{
+    console.error('Delete file :'+delFileName+' in '+delFolderName+' /  creater'+userName);
+    
+        Axios({
+            method:'get',
+            url: serverUrl+'/file/fileDelete',
+            params:{
+                creater: userName,
+                folderName: delFolderName,
+                fileName: delFileName
+            },
+            responseType:'json'
+        }).then(res=>{
+            console.error(res);
+            this.setState({retrieveItems: res.data.items})
+        }).catch(err=>{
+            console.error(err);
+        })
+    },500)
+    
+    return () => clearTimeout(Timer);
+
 }
 
 //End of Drive Page Functions
