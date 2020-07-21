@@ -209,7 +209,7 @@ export function uploadFile(e){
     const{file} = this.state;
     console.error(file)
     //alert(file);
-    !({file}) && alert('File not Selected XXXXX');
+    !({file}) && alert('File not Selected XXXXXYYY');
     
     const sessionData = store.getState()
     console.error(sessionData.sessionUser.data)
